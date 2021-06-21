@@ -1,13 +1,18 @@
 import { Component } from "react";
 import "./App.css";
 import Searchbar from "./components/Searchbar";
-import API from './services/API'
+import API from './services/API';
+import Modal from './components/Modal';
+import Button from './components/Button';
+import ImageGallery from './components/ImageGallery'
 
 class App extends Component {
   state = {
     pictures: [],
     currentPage: 1,
-    searchQuery: ''
+    searchQuery: '',
+    showModal: false,
+    largeImageURL: ''
   };
 
   componentDidMount() {
@@ -20,17 +25,31 @@ class App extends Component {
     }
   }
 
+  toggleModal = () => {
+    this.setState(({showModal} ) => ({
+      showModal: !showModal,
+    }))
+  }
+
   onChangeQuery = query => {
     this.setState({ searchQuery: query, currentPage: 1, pictures: [] });   
   }
 
+  scrollWindow() {
+    window.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior: 'smooth'
+    });
+  }
+  
   fetchPictures = () => {
     
-    const { currentPage, searchQuery } = this.state;
+    const { currentPage, searchQuery, largeImageURL } = this.state;
     
     const options = {
       currentPage,
-      searchQuery
+      searchQuery,
+      largeImageURL
     }
     API.fetchPictures(options)
       .then(pictures => {  
@@ -39,36 +58,44 @@ class App extends Component {
           currentPage: prevState.currentPage + 1,
         }));
       });
+    this.scrollWindow()
+  }
+
+  handleItemClick = (url, alt) => {   
+    this.setState({
+      largeImageURL: url
+    })
+    this.toggleModal()
   }
 
   render() {
-    const { pictures } = this.state;
+    const { pictures, showModal, largeImageURL } = this.state;
     return (
-      <div>
+      <div className="App">
         <h1>Pictures</h1>
 
-        <Searchbar onSubmit={this.onChangeQuery}/>
-
-        <ul>
-          {pictures.map(({ id, userImageURL, tags }) => (
-            <li key={id}> 
-              <img src={userImageURL} alt={tags}/>
-            </li>
-          ))}
-        </ul>
-        
+        <Searchbar
+          onSubmit={this.onChangeQuery}
+        />
+         
+        <ImageGallery
+          pictures={pictures}
+        />
+                 
         {pictures.length > 0 && (
-          <button type="button" onClick={this.fetchPictures}>Load more...</button>)}
-      </div>
+          <Button onClick={this.fetchPictures}
+          />)}
+        
+        {showModal && (
+          <Modal onClose ={this.toggleModal}>
+            <img src={largeImageURL} alt="" />
+          </Modal>)}
+                
+      </div> 
     )
   }
 }
 
-  //     <Searchbar>
-  //       <ImageGallery>
-  //         <ImageGalleryItem>
-  //         <Loader>
-  //             <Button>
-  //               <Modal></Modal>
+  //         <Loader>          
 
 export default App;
