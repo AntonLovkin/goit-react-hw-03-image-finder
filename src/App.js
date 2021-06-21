@@ -1,10 +1,12 @@
 import { Component } from "react";
 import "./App.css";
+import SearchLoader from './components/Loader';
 import Searchbar from "./components/Searchbar";
 import API from './services/API';
 import Modal from './components/Modal';
 import Button from './components/Button';
-import ImageGallery from './components/ImageGallery'
+import ImageGallery from './components/ImageGallery';
+
 
 class App extends Component {
   state = {
@@ -12,7 +14,8 @@ class App extends Component {
     currentPage: 1,
     searchQuery: '',
     showModal: false,
-    largeImageURL: ''
+    largeImageURL: '',
+    isLoading: false,
   };
 
   componentDidMount() {
@@ -45,6 +48,8 @@ class App extends Component {
   fetchPictures = () => {
     
     const { currentPage, searchQuery, largeImageURL } = this.state;
+
+    this.setState({ isLoading: true });
     
     const options = {
       currentPage,
@@ -57,8 +62,10 @@ class App extends Component {
           pictures: [...prevState.pictures, ...pictures],
           currentPage: prevState.currentPage + 1,
         }));
-      });
-    this.scrollWindow()
+        this.scrollWindow()
+      })
+    .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
   }
 
   handleItemClick = (url, alt) => {   
@@ -69,11 +76,10 @@ class App extends Component {
   }
 
   render() {
-    const { pictures, showModal, largeImageURL } = this.state;
+    const { pictures, showModal, largeImageURL, isLoading } = this.state;
     return (
       <div className="App">
-        <h1>Pictures</h1>
-
+       
         <Searchbar
           onSubmit={this.onChangeQuery}
         />
@@ -81,6 +87,8 @@ class App extends Component {
         <ImageGallery
           pictures={pictures}
         />
+
+        {isLoading && <SearchLoader/>}
                  
         {pictures.length > 0 && (
           <Button onClick={this.fetchPictures}
