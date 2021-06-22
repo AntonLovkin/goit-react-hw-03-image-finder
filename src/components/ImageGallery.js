@@ -1,7 +1,7 @@
 import React from "react";
 import ImageGalleryItem from '../components/ImageGalleryItem'
 
-const ImageGallery = ({pictures}) => {
+const ImageGallery = ({pictures, handleItemClick}) => {
     return (
         <ul className="ImageGallery">
           {pictures.map(({ id, webformatURL, tags, largeImageURL }) => (
@@ -9,7 +9,7 @@ const ImageGallery = ({pictures}) => {
               key={id}    
               src={webformatURL}
               alt={tags}
-              onClick={()=> {this.handleItemClick(largeImageURL, tags )}}/>            
+              onClick={()=> {handleItemClick(largeImageURL, tags )}}/>            
           ))}
         </ul>    
        

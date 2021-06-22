@@ -83,12 +83,15 @@ class App extends Component {
         <Searchbar
           onSubmit={this.onChangeQuery}
         />
-         
+
+        {isLoading && <SearchLoader />}
+        
         <ImageGallery
           pictures={pictures}
+          handleItemClick={this.handleItemClick}
         />
 
-        {isLoading && <SearchLoader/>}
+        
                  
         {pictures.length > 0 && (
           <Button onClick={this.fetchPictures}
@@ -103,7 +106,6 @@ class App extends Component {
     )
   }
 }
-
-  //         <Loader>          
+       
 
 export default App;
